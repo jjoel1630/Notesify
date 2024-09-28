@@ -12,8 +12,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-api_key = os.getenv("OPEN-API-KEY")
-
 app = Flask(__name__)
 
 
@@ -24,12 +22,22 @@ def index():
 @app.route('/api/create_script', methods=['POST'])
 def handle_data():
     if request.method == 'POST':
-        data = request.form.get('text')
-        duration = int (request.form.get('duration'))
+        data = request.get_json()["text"]
+        duration = int (request.get_json()["duration"])
         
         script = create_script(duration, data)
+
+        split_script = script.split(" ");
+        res_arr = []
+        res_arr_idx = -1
+        for i in range(len(split_script)):
+            if i % 100 == 0:
+                res_arr_idx += 1
+                res_arr.append("")
+
+            res_arr[res_arr_idx] = res_arr[res_arr_idx] + " " + split_script[i]
         
-        return jsonify({'message': 'Data received', 'text': script})
+        return jsonify({'message': 'Data received', 'text': res_arr})
 
 
 ''' Create Script Methods '''

@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-api_key = os.getenv("OPEN-API-KEY")
+api_key = os.getenv("OPEN_API_KEY")
 
 def normalize_text(text):
     # Normalize Unicode characters to their closest ASCII representation
