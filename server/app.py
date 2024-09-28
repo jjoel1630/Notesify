@@ -2,13 +2,13 @@ from flask import Flask, request, jsonify
 from modules.create_script import condense, convertToScript
 from modules.upload_audio import init_mongodb, upload_audio
 from modules.tts import chunk_text, synthesize_speech, combine_audios
+from modules.conversion import *
+from bson import ObjectId
 
 from dotenv import load_dotenv
 
 load_dotenv()
 client = init_mongodb()
-db = client['audio']
-collection = db['files']
 
 app = Flask(__name__)
 
@@ -46,6 +46,9 @@ def upload_tts():
         audio_content = synthesize_speech(chunk, idx)
         audios.append(audio_content)
 
+    db = client['audio']
+    collection = db['files']
+
     combined = combine_audios(audios, "outputs/combined_audio.mp3")
     document_id = upload_audio(combined, "this is a test name", collection)
 
@@ -54,8 +57,29 @@ def upload_tts():
 @app.route('/api/get_audio_id', methods=['POST'])
 def get_audio_id():
     if request.method == 'POST':
-        data = request.get_json()["text"]
+        file_id = request.get_json()["file_id"]
         duration = int (request.get_json()["duration"])
+
+        file_db = client['input_files']
+        file_collection = file_db['files']
+        document = file_collection.find_one({'_id': ObjectId(file_id)})
+
+        if document is None:
+            return "File not found in the database."
+        
+        file_data = document.get('file_data')
+        file_type = document.get('file_type')
+
+        if file_type == "pdf":
+            data = pdf_to_txt(file_data)
+        elif file_type == "latex":
+            data = pdf_to_txt(file_data)
+        elif file_type == "docx":
+            data = docx_to_txt(file_data)
+        elif file_type == "jpg":
+            data = jpg_to_txt(file_data)
+        elif file_type == "written_jpg":
+            data = written_jpg_to_txt(file_data)
         
         script = create_script(duration, data)
 
@@ -76,10 +100,44 @@ def get_audio_id():
             audio_content = synthesize_speech(chunk, idx)
             audios.append(audio_content)
 
+        audio_db = client['audio']
+        audio_collection = audio_db['files']
+
         combined = combine_audios(audios, "outputs/combined_audio.mp3")
-        document_id = upload_audio(combined, "this is a test name", collection)
+        document_id = upload_audio(combined, "audio_file", audio_collection)
 
         return jsonify({'message': 'Data received', 'document_id': str(document_id), 'text': res_arr})
+
+@app.route('/api/conversion', methods=["POST"])
+def conversion():
+    with open("files/notes_example.pdf", "rb") as file:
+        file_binary = file.read()
+        document = {
+            "file_name": "notes_example",
+            "file_type": "pdf",
+            "file_data": file_binary
+        }
+
+        file_db = client['input_files']
+        file_collection = file_db['files']
+        
+        # Insert the document into MongoDB collection
+        result = file_collection.insert_one(document)
+        return str(result.inserted_id)
+    # return str(result.inserted_id)
+
+@app.route('/api/file_to_text', methods=["POST"])
+def file_to_text():
+    file_db = client['input_files']
+    file_collection = file_db['files']
+    document = file_collection.find_one({'_id': ObjectId("66f8541ddc30f544eeb40101")})
+
+    if document is None:
+        return "File not found in the database."
+    
+    file_data = document.get('file_data')
+    file_type = document.get('file_type')
+    return "done"
 
 # Run all create_script methods and return final response
 def create_script(maxDuration, text, WPM=160):

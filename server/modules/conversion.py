@@ -3,20 +3,24 @@ import PyPDF2
 import docx
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 from PIL import Image
+import io
 
-def latex_to_txt(latex_filename):
-    with open(latex_filename, 'r', encoding='utf-8') as latex_file:
-        latex_content = latex_file.read()
-    
+def latex_to_txt(latex_bytes):
+    # Ensure the input is in bytes
+    if isinstance(latex_bytes, bytes):
+        try:
+            # Attempt to decode with UTF-8
+            latex_content = latex_bytes.decode('utf-8')
+        except UnicodeDecodeError:
+            # Fallback to ISO-8859-1 if UTF-8 fails
+            latex_content = latex_bytes.decode('ISO-8859-1')  
+
+    # Convert LaTeX content to plain text
     plain_text = pydetex.pipelines.simple(latex_content)
-
     return plain_text
-    
-    #print(f"Translation complete! Text has been saved to {output_filename}.")
 
-def pdf_to_txt(pdf_filename):
-    # Open the PDF file
-    with open(pdf_filename, 'rb') as pdf_file:
+def pdf_to_txt(pdf_bytes):
+    with io.BytesIO(pdf_bytes) as pdf_file:
         # Create a PDF reader object
         pdf_reader = PyPDF2.PdfReader(pdf_file)
         text = ""
@@ -24,60 +28,60 @@ def pdf_to_txt(pdf_filename):
         # Iterate through each page and extract text
         for page_num in range(len(pdf_reader.pages)):
             page = pdf_reader.pages[page_num]
-            text += page.extract_text() + "\n"  
+            page_text = page.extract_text()
+
+            # Ensure we handle None values in case text extraction fails
+            if page_text:
+                text += page_text + "\n"  
 
     return text
-    #print(f"Text extraction complete! Text has been saved to {output_filename}.")
 
-def docx_to_txt(docx_filename, output_filename):
-    # Load the .docx file
-    doc = docx.Document(docx_filename)
-    
-    # Extract all the text from the document
-    full_text = []
-    for para in doc.paragraphs:
-        full_text.append(para.text)
+def docx_to_txt(docx_bytes):
+    with io.BytesIO(docx_bytes) as docx_file:
+        # Load the .docx file
+        doc = docx.Document(docx_file)
+        
+        # Extract all the text from the document
+        full_text = []
+        for para in doc.paragraphs:
+            full_text.append(para.text)
 
-    # Join paragraphs with newline and write to the .txt file
+    # Join paragraphs with newline and return the extracted text
     return "\n".join(full_text)
     
-    #print(f"Text extraction complete! Text has been saved to {output_filename}.")
+def jpg_to_txt(jpg_bytes):
+    # Create a file-like object from the raw bytes
+    with io.BytesIO(jpg_bytes) as jpg_file:
+        # Load the image from the byte stream
+        image = Image.open(jpg_file).convert("RGB")
 
-def jpg_to_txt(jpg_filename, output_filename):
+    # Initialize the processor and model
     processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
     model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
 
-    # load image from the IAM dataset
-    image = Image.open(jpg_filename).convert("RGB")
-
+    # Process the image and generate text
     pixel_values = processor(image, return_tensors="pt").pixel_values
     generated_ids = model.generate(pixel_values)
 
+    # Decode the generated text
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
     return generated_text
 
-    # # Print and save the generated text
-    # print("Generated Text: ", generated_text)
 
-    # # Store the text in a file named output.txt
-    # with open(output_filename, "w", encoding="utf-8") as file:
-    #     file.write(generated_text)
+def written_jpg_to_txt(written_jpg_bytes):
+    # Create a file-like object from the raw bytes
+    with io.BytesIO(written_jpg_bytes) as written_jpg_file:
+        # Load the image from the byte stream
+        image = Image.open(written_jpg_file).convert("RGB")
 
-
-def written_jpg_to_txt(written_jpg_filename, output_filename):
-    image = Image.open(written_jpg_filename).convert("RGB")
-
+    # Initialize the processor and model
     processor = TrOCRProcessor.from_pretrained('microsoft/trocr-large-handwritten')
     model = VisionEncoderDecoderModel.from_pretrained('microsoft/trocr-large-handwritten')
+
+    # Process the image and generate text
     pixel_values = processor(images=image, return_tensors="pt").pixel_values
-
     generated_ids = model.generate(pixel_values)
+
+    # Decode the generated text
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
-
     return generated_text
-    # Print and save the generated text
-    # print("Generated Text: ", generated_text)
-
-    # # Store the text in a file named output.txt
-    # with open(output_filename, "w", encoding="utf-8") as file:
-    #     file.write(generated_text)
