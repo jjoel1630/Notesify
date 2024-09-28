@@ -24,3 +24,5 @@ yarn-error.log*
 
 # virtualenv
 server-env
+.env
+google-cloud-sdk
