@@ -26,3 +26,5 @@ yarn-error.log*
 server-env
 .env
 google-cloud-sdk
+server-env
+__pycache__
