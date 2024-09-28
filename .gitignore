@@ -24,4 +24,7 @@ yarn-error.log*
 
 # virtualenv
 server-env
+.env
 google-cloud-sdk
+server-env
+__pycache__
