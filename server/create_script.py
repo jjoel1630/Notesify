@@ -116,7 +116,6 @@ if __name__ == "__main__":
     
     text = read_text(file_path)
     
-    # TODO: if maxWords < # words in text, then use summarize
     response = convertToScript(text)
     if (len(response) > maxWords):
         print("condensing text now")
