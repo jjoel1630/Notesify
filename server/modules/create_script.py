@@ -103,9 +103,10 @@ def read_text(file_path):
     return text
 
 if __name__ == "__main__":
-    current_directory = os.getcwd()  # Get the current working directory
-    file_name = "notes_example.txt"  # The name of the file
-    file_path = os.path.join(current_directory, "server", file_name)  # Construct the absolute path
+    # current_directory = os.getcwd()  # Get the current working directory
+    # file_name = "notes_example.txt"  # The name of the file
+    # file_path = os.path.join(current_directory, "server", file_name)  # Construct the absolute path
+    file_path = '../files/notes_example.txt'
 
     openai.api_key = api_key
     
