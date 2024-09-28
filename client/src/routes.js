@@ -13,10 +13,12 @@ var dashRoutes = [
 		icon: <HomeIcon color="inherit" />,
 		component: Dashboard,
 		layout: "/",
+		fileId: "",
+		audioId: "",
 	},
 	{
-		path: "audionote/1",
-		name: "[filename]",
+		path: "1",
+		name: "[filename1]",
 		icon: <HomeIcon color="inherit" />,
 		component: Dashboard,
 		layout: "/",
@@ -24,13 +26,13 @@ var dashRoutes = [
 		audioId: "1",
 	},
 	{
-		path: "audionote/2",
-		name: "[filename]",
+		path: "2",
+		name: "[filename2]",
 		icon: <HomeIcon color="inherit" />,
 		component: Dashboard,
 		layout: "/",
-		fileId: "1",
-		audioId: "1",
+		fileId: "2",
+		audioId: "2",
 	},
 ];
 export default dashRoutes;

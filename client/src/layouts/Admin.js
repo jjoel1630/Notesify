@@ -50,13 +50,29 @@ export default function Dashboard(props) {
 
 	const getRoutes = (routes) => {
 		return routes.map((prop, key) => {
-			if (prop.layout === "/") {
-				return (
-					<Route path={prop.layout + prop.path} component={prop.component} key={key} />
-				);
-			} else {
-				return null;
-			}
+			// console.log(prop.fileId);
+			// console.log(prop.audioId);
+			// console.log(prop.name);
+			// console.log(prop.layout + prop.path + key);
+			return (
+				<Route
+					path={prop.layout + prop.path}
+					component={(routeProps) => {
+						// Ensure no unnecessary re-renders happen
+						console.log(prop);
+						return (
+							<prop.component
+								{...routeProps}
+								fileID={prop.fileId}
+								audioID={prop.audioId}
+								fileName={prop.name}
+								customProp="custom"
+							/>
+						);
+					}}
+					key={`${prop.layout}${prop.path}${prop.fileId}`}
+				/>
+			);
 		});
 	};
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -98,16 +114,14 @@ export default function Dashboard(props) {
 					base: "100%",
 					xl: "calc(100% - 275px)",
 				}}>
-				{getRoute() ? (
-					<PanelContent>
-						<PanelContainer>
-							<Switch>
-								{getRoutes(routes)}
-								<Redirect from="/" to="audionote" />
-							</Switch>
-						</PanelContainer>
-					</PanelContent>
-				) : null}
+				<PanelContent>
+					<PanelContainer>
+						<Switch>
+							{getRoutes(routes)}
+							<Redirect from="/" to="audionote" />
+						</Switch>
+					</PanelContainer>
+				</PanelContent>
 			</MainPanel>
 		</Box>
 	);
