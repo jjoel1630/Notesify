@@ -51,10 +51,20 @@ def read_text(file_path):
     return text
 
 if __name__ == "__main__":
-    file_path = "/Users/anujnaik/Desktop/HackGT/hackgt-project/server/notes_example.txt"
+    current_directory = os.getcwd()  # Get the current working directory
+    file_name = "notes_example.txt"  # The name of the file
+    file_path = os.path.join(current_directory, "server", file_name)  # Construct the absolute path
+
     openai.api_key = api_key
     
+    maxDuration = 3 # minutes
+    WPM = 160
+    maxWords = maxDuration * WPM
+    
     text = read_text(file_path)
+    
+    # TODO: if maxWords < # words in text, then use summarize
+    
     response = convertToScript(text)
     
     print(response)
