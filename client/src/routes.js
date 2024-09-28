@@ -1,37 +1,36 @@
 // import
-import React, { Component }  from 'react';
+import React from "react";
 import Dashboard from "views/Dashboard/Dashboard.js";
+import Tables from "views/Dashboard/Tables.js";
 import Billing from "views/Dashboard/Billing.js";
-import Profile from "views/Dashboard/Profile.js";
-import SignIn from "views/Pages/SignIn.js";
-import SignUp from "views/Pages/SignUp.js";
 
-import {
-  HomeIcon,
-  StatsIcon,
-  CreditIcon,
-  PersonIcon,
-  DocumentIcon,
-  RocketIcon,
-  SupportIcon,
-} from "components/Icons/Icons";
+import { HomeIcon, StatsIcon, CreditIcon } from "components/Icons/Icons";
 
 var dashRoutes = [
-  {
-    path: "/dashboard",
-    name: "Dashboard",
-    rtlName: "لوحة القيادة",
-    icon: <HomeIcon color='inherit' />,
-    component: Dashboard,
-    layout: "/admin",
-  },
-  // {
-  //   path: "/billing",
-  //   name: "Billing",
-  //   rtlName: "لوحة القيادة",
-  //   icon: <CreditIcon color='inherit' />,
-  //   component: Billing,
-  //   layout: "/admin",
-  // },
+	{
+		path: "audionote",
+		name: "New Note",
+		icon: <HomeIcon color="inherit" />,
+		component: Dashboard,
+		layout: "/",
+	},
+	{
+		path: "audionote/1",
+		name: "[filename]",
+		icon: <HomeIcon color="inherit" />,
+		component: Dashboard,
+		layout: "/",
+		fileId: "1",
+		audioId: "1",
+	},
+	{
+		path: "audionote/2",
+		name: "[filename]",
+		icon: <HomeIcon color="inherit" />,
+		component: Dashboard,
+		layout: "/",
+		fileId: "1",
+		audioId: "1",
+	},
 ];
 export default dashRoutes;
