@@ -5,18 +5,17 @@ from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 import requests
 from PIL import Image
 
-def latex_to_txt(latex_filename, output_filename):
+def latex_to_txt(latex_filename):
     with open(latex_filename, 'r', encoding='utf-8') as latex_file:
         latex_content = latex_file.read()
     
     plain_text = pydetex.pipelines.simple(latex_content)
 
-    with open(output_filename, 'w', encoding='utf-8') as txt_file:
-        txt_file.write(plain_text)
+    return plain_text
     
-    print(f"Translation complete! Text has been saved to {output_filename}.")
+    #print(f"Translation complete! Text has been saved to {output_filename}.")
 
-def pdf_to_txt(pdf_filename, output_filename):
+def pdf_to_txt(pdf_filename):
     # Open the PDF file
     with open(pdf_filename, 'rb') as pdf_file:
         # Create a PDF reader object
@@ -26,13 +25,10 @@ def pdf_to_txt(pdf_filename, output_filename):
         # Iterate through each page and extract text
         for page_num in range(len(pdf_reader.pages)):
             page = pdf_reader.pages[page_num]
-            text += page.extract_text() + "\n"
-    
-    # Write the extracted text to a .txt file
-    with open(output_filename, 'w', encoding='utf-8') as txt_file:
-        txt_file.write(text)
-    
-    print(f"Text extraction complete! Text has been saved to {output_filename}.")
+            text += page.extract_text() + "\n"  
+
+    return text
+    #print(f"Text extraction complete! Text has been saved to {output_filename}.")
 
 def docx_to_txt(docx_filename, output_filename):
     # Load the .docx file
@@ -44,10 +40,9 @@ def docx_to_txt(docx_filename, output_filename):
         full_text.append(para.text)
 
     # Join paragraphs with newline and write to the .txt file
-    with open(output_filename, 'w', encoding='utf-8') as txt_file:
-        txt_file.write("\n".join(full_text))
+    return "\n".join(full_text)
     
-    print(f"Text extraction complete! Text has been saved to {output_filename}.")
+    #print(f"Text extraction complete! Text has been saved to {output_filename}.")
 
 def jpg_to_txt(jpg_filename, output_filename):
     processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
@@ -60,13 +55,14 @@ def jpg_to_txt(jpg_filename, output_filename):
     generated_ids = model.generate(pixel_values)
 
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    return generated_text
 
-    # Print and save the generated text
-    print("Generated Text: ", generated_text)
+    # # Print and save the generated text
+    # print("Generated Text: ", generated_text)
 
-    # Store the text in a file named output.txt
-    with open(output_filename, "w", encoding="utf-8") as file:
-        file.write(generated_text)
+    # # Store the text in a file named output.txt
+    # with open(output_filename, "w", encoding="utf-8") as file:
+    #     file.write(generated_text)
 
 
 def written_jpg_to_txt(written_jpg_filename, output_filename):
@@ -79,9 +75,10 @@ def written_jpg_to_txt(written_jpg_filename, output_filename):
     generated_ids = model.generate(pixel_values)
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
+    return generated_text
     # Print and save the generated text
-    print("Generated Text: ", generated_text)
+    # print("Generated Text: ", generated_text)
 
-    # Store the text in a file named output.txt
-    with open(output_filename, "w", encoding="utf-8") as file:
-        file.write(generated_text)
+    # # Store the text in a file named output.txt
+    # with open(output_filename, "w", encoding="utf-8") as file:
+    #     file.write(generated_text)
