@@ -18,6 +18,7 @@ import PanelContent from "../components/Layout/PanelContent";
 import bgAdmin from "assets/img/admin-background.png";
 import componentMap from "views/Dashboard/ComponentMap";
 import { useHistory } from "react-router-dom";
+import dashRoutes from "routes";
 
 export default function Dashboard(props) {
 	const history = useHistory();
@@ -112,7 +113,7 @@ export default function Dashboard(props) {
 	document.documentElement.dir = "ltr";
 	// Chakra Color Mode
 	return (
-		<Box>
+		<Box bg="gray.800">
 			{/* <Box
 				minH="40vh"
 				w="100%"
@@ -122,31 +123,18 @@ export default function Dashboard(props) {
 				bgSize="cover"
 				top="0"
 			/> */}
-			<Sidebar
-				routes={JSON.parse(localStorage.getItem("uploadedFiles")) || [routes[0]]}
-				logo={
-					<Stack direction="row" spacing="12px" align="center" justify="center">
-						{colorMode === "dark" ? (
-							<ArgonLogoLight w="74px" h="27px" />
-						) : (
-							<ArgonLogoDark w="74px" h="27px" />
-						)}
-						<Box w="1px" h="20px" bg={colorMode === "dark" ? "white" : "gray.700"} />
-						{colorMode === "dark" ? (
-							<ChakraLogoLight w="82px" h="21px" />
-						) : (
-							<ChakraLogoDark w="82px" h="21px" />
-						)}
-					</Stack>
-				}
-				display="none"
-				{...rest}
-			/>
 			<MainPanel
 				w={{
 					base: "100%",
-					xl: "calc(100% - 275px)",
-				}}>
+					// xl: "calc(100% - 275px)",
+				}}
+				bg="gray.400"
+				bgImage="url('https://img.freepik.com/free-vector/dark-gradient-background-with-copy-space_53876-99548.jpg')"
+				bgSize="cover"
+				bgPosition="center"
+				position="relative">
+				<Sidebar routes={[dashRoutes[0]]} display="none" />
+				{/* https://img.freepik.com/free-vector/dark-gradient-background-with-copy-space_53876-99548.jpg */}
 				<PanelContent>
 					<PanelContainer>
 						<Switch>

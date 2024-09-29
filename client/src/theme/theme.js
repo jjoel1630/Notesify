@@ -11,14 +11,14 @@ import { PanelContentComponent } from "./additions/layout/PanelContent";
 import { PanelContainerComponent } from "./additions/layout/PanelContainer";
 // import { mode } from "@chakra-ui/theme-tools";
 export default extendTheme(
-  { breakpoints }, // Breakpoints
-  globalStyles,
-  buttonStyles, // Button styles
-  badgeStyles, // Badge styles
-  linkStyles, // Link styles
-  inputStyles, // Input styles
-  CardComponent, // Card component
-  MainPanelComponent, // Main Panel component
-  PanelContentComponent, // Panel Content component
-  PanelContainerComponent // Panel Container component
+	{ breakpoints, initialColorMode: "dark" }, // Breakpoints
+	globalStyles,
+	buttonStyles, // Button styles
+	badgeStyles, // Badge styles
+	linkStyles, // Link styles
+	inputStyles, // Input styles
+	CardComponent, // Card component
+	MainPanelComponent, // Main Panel component
+	PanelContentComponent, // Panel Content component
+	PanelContainerComponent // Panel Container component
 );

@@ -77,7 +77,7 @@ def get_audio_id():
             data = pdf_to_txt(file_data)
         elif file_type == "latex":
             data = pdf_to_txt(file_data)
-        elif file_type == "docx":
+        elif file_type == "vnd.openxmlformats-officedocument.wordprocessingml.document":
             data = docx_to_txt(file_data)
         elif file_type == "jpg":
             data = jpg_to_txt(file_data)
@@ -90,7 +90,7 @@ def get_audio_id():
         res_arr = []
         res_arr_idx = -1
         for i in range(len(split_script)):
-            if i % 100 == 0:
+            if i % 80 == 0:
                 res_arr_idx += 1
                 res_arr.append("")
 
@@ -109,7 +109,8 @@ def get_audio_id():
         combined = combine_audios(audios, "outputs/combined_audio.mp3")
         document_id = upload_audio(combined, "audio_file", audio_collection)
 
-        return jsonify({'message': 'Data received', 'document_id': str(document_id), 'text': res_arr})
+        return jsonify({'message': 'Data received', 'document_id': str(document_id), 'text': [res_arr]})
+        # return jsonify({'message': 'Data received', 'document_id': str("66f8d067f31aa50136e4e58c"), 'text': ["hello", "this is the transcript", "say hi"]})
 
 @app.route('/api/conversion', methods=["POST"])
 def conversion():
@@ -172,7 +173,7 @@ def get_audio_byte():
 
     if audio:
         audio_base64 = base64.b64encode(audio).decode('utf-8')  # Convert bytes to base64 string
-        print(jsonify({"audio": audio_base64}))
+        # print(jsonify({"audio": audio_base64}))
         return jsonify({"audio": audio_base64})
     else:
         return jsonify({"error": "No audio data found."}),

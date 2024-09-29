@@ -4,7 +4,7 @@ import io
 
 client = texttospeech.TextToSpeechClient()
 
-def chunk_text(content, limit=5000):
+def chunk_text(content, limit=3000):
     chunks = []
     while content:
         chunk = content[:limit]
