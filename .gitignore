@@ -28,3 +28,4 @@ server-env
 google-cloud-sdk
 server-env
 __pycache__
+myenv
