@@ -107,7 +107,7 @@ def gpt_call(system_prompt, user_prompt):
     
     return output
 
-def convert_to_script(text):
+def convertToScript(text):
     openai.api_key = api_key
     max_length = len(text.split())
     max_tokens = 1000
