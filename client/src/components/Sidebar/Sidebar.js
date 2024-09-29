@@ -17,6 +17,7 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 import IconBox from "components/Icons/IconBox";
+import { HomeIcon } from "components/Icons/Icons";
 import {
 	renderThumbDark,
 	renderThumbLight,
@@ -54,32 +55,32 @@ function Sidebar(props) {
 		let inactiveColor = useColorModeValue("gray.400", "gray.400");
 		let sidebarActiveShadow = "0px 7px 11px rgba(0, 0, 0, 0.04)";
 		return routes.map((prop, key) => {
-			if (prop.redirect) {
-				return null;
-			}
-			if (prop.category) {
-				var st = {};
-				st[prop["state"]] = !state[prop.state];
-				return (
-					<>
-						<Text
-							color={activeColor}
-							fontWeight="bold"
-							mb={{
-								xl: "6px",
-							}}
-							mx="auto"
-							ps={{
-								sm: "10px",
-								xl: "16px",
-							}}
-							py="12px">
-							{prop.name}
-						</Text>
-						{createLinks(prop.views)}
-					</>
-				);
-			}
+			// if (prop.redirect) {
+			// 	return null;
+			// }
+			// if (prop.category) {
+			// 	var st = {};
+			// 	st[prop["state"]] = !state[prop.state];
+			// 	return (
+			// 		<>
+			// 			<Text
+			// 				color={activeColor}
+			// 				fontWeight="bold"
+			// 				mb={{
+			// 					xl: "6px",
+			// 				}}
+			// 				mx="auto"
+			// 				ps={{
+			// 					sm: "10px",
+			// 					xl: "16px",
+			// 				}}
+			// 				py="12px">
+			// 				{prop.name}
+			// 			</Text>
+			// 			{createLinks(prop.views)}
+			// 		</>
+			// 	);
+			// }
 			return (
 				<NavLink to={prop.layout + prop.path} key={key}>
 					{activeRoute(prop.layout + prop.path) === "active" ? (
@@ -123,7 +124,7 @@ function Sidebar(props) {
 										w="30px"
 										me="12px"
 										transition={variantChange}>
-										{prop.icon}
+										<HomeIcon color="inherit" />
 									</IconBox>
 								)}
 								<Text color={activeColor} my="auto" fontSize="sm">
@@ -172,7 +173,7 @@ function Sidebar(props) {
 										w="30px"
 										me="12px"
 										transition={variantChange}>
-										{prop.icon}
+										<HomeIcon color="inherit" />
 									</IconBox>
 								)}
 								<Text color={inactiveColor} my="auto" fontSize="sm">

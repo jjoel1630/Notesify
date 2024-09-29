@@ -3,7 +3,9 @@ from modules.create_script import condense, convertToScript
 from modules.upload_audio import init_mongodb, upload_audio
 from modules.tts import chunk_text, synthesize_speech, combine_audios
 from modules.conversion import *
-from bson import ObjectId
+from bson import ObjectId, Binary
+from flask_cors import CORS, cross_origin
+import base64
 
 from dotenv import load_dotenv
 
@@ -11,6 +13,7 @@ load_dotenv()
 client = init_mongodb()
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 @app.route('/')
 def index():
@@ -148,6 +151,55 @@ def create_script(maxDuration, text, WPM=160):
         response = condense(response, maxWords)
     
     return response
+
+@app.route('/api/get_audio_byte', methods=['GET'])
+@cross_origin()
+def get_audio_byte():
+    db = client['audio']
+    collection = db['files']
+
+    f_id = request.args.get('file_id')
+
+    # print(f_id)
+
+    file_id = ObjectId(f_id)
+    document = collection.find_one({'_id': file_id})
+    if document is None:
+        return "File not found in the database."
+    
+    audio = document.get('audio')
+    print(audio)
+
+    if audio:
+        audio_base64 = base64.b64encode(audio).decode('utf-8')  # Convert bytes to base64 string
+        print(jsonify({"audio": audio_base64}))
+        return jsonify({"audio": audio_base64})
+    else:
+        return jsonify({"error": "No audio data found."}),
+    # return audio
+
+@app.route('/api/upload_file', methods=['POST'])
+@cross_origin()
+def upload_file():
+    req = request.get_json()
+
+    # Ensure file data is received
+    if not req or "file_bin" not in req:
+        return jsonify({"error": "No file data provided"}), 400
+
+    # Prepare the document to be inserted
+    document = {
+        "file_name": req["name"],
+        "file_type": req["type"],
+        "file_data": base64.b64decode(req["file_bin"])  # Decode the base64 string to binary
+    }
+
+    file_db = client['input_files']
+    file_collection = file_db['files']
+    
+    # Insert the document into MongoDB collection
+    result = file_collection.insert_one(document)
+    return jsonify({"message": "File uploaded successfully", "id": str(result.inserted_id)}), 201
 
 if __name__ == '__main__':
 	app.run(debug=True)

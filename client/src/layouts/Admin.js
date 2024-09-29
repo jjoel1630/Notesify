@@ -16,8 +16,12 @@ import MainPanel from "../components/Layout/MainPanel";
 import PanelContainer from "../components/Layout/PanelContainer";
 import PanelContent from "../components/Layout/PanelContent";
 import bgAdmin from "assets/img/admin-background.png";
+import componentMap from "views/Dashboard/ComponentMap";
+import { useHistory } from "react-router-dom";
 
 export default function Dashboard(props) {
+	const history = useHistory();
+
 	const { ...rest } = props;
 	// states and functions
 	const [fixed, setFixed] = useState(false);
@@ -49,28 +53,57 @@ export default function Dashboard(props) {
 	};
 
 	const getRoutes = (routes) => {
-		return routes.map((prop, key) => {
-			// console.log(prop.fileId);
-			// console.log(prop.audioId);
-			// console.log(prop.name);
-			// console.log(prop.layout + prop.path + key);
+		// return routes.map((prop, key) => {
+		// 	// console.log(prop.fileId);
+		// 	// console.log(prop.audioId);
+		// 	// console.log(prop.name);
+		// 	// console.log(prop.layout + prop.path + key);
+		// 	return (
+		// 		<Route
+		// 			path={prop.layout + prop.path}
+		// 			component={(routeProps) => {
+		// 				// Ensure no unnecessary re-renders happen
+		// 				// console.log(prop);
+		// 				return (
+		// 					<prop.component
+		// 						{...routeProps}
+		// 						fileID={prop.fileId}
+		// 						audioID={prop.audioId}
+		// 						fileName={prop.name}
+		// 						customProp="custom"
+		// 					/>
+		// 				);
+		// 			}}
+		// 			key={`${prop.layout}${prop.path}${prop.fileId}`}
+		// 		/>
+		// 	);
+		// });
+		// Retrieve uploaded files from local storage
+		const storedFiles = JSON.parse(localStorage.getItem("uploadedFiles")) || [routes[0]];
+		console.log(storedFiles);
+
+		return storedFiles.map((fileData, key) => {
+			// console.log(fileData);
+			const RouteComponent = (routeProps) => {
+				const ComponentToRender = componentMap["dashboard"];
+				// console.log("FileData in RouteComponent:", fileData); // This should log correctly
+
+				return (
+					<ComponentToRender
+						{...routeProps}
+						fileID={fileData.fileId}
+						audioID={fileData.audioId}
+						fileName={fileData.name}
+						customProp="custom"
+					/>
+				);
+			};
+
 			return (
 				<Route
-					path={prop.layout + prop.path}
-					component={(routeProps) => {
-						// Ensure no unnecessary re-renders happen
-						console.log(prop);
-						return (
-							<prop.component
-								{...routeProps}
-								fileID={prop.fileId}
-								audioID={prop.audioId}
-								fileName={prop.name}
-								customProp="custom"
-							/>
-						);
-					}}
-					key={`${prop.layout}${prop.path}${prop.fileId}`}
+					path={`/${fileData.fileId}`} // Adjust this path as needed
+					render={RouteComponent} // Use the new functional component
+					key={`${fileData.fileId}${key}`} // Unique key for each route
 				/>
 			);
 		});
@@ -80,7 +113,7 @@ export default function Dashboard(props) {
 	// Chakra Color Mode
 	return (
 		<Box>
-			<Box
+			{/* <Box
 				minH="40vh"
 				w="100%"
 				position="absolute"
@@ -88,9 +121,9 @@ export default function Dashboard(props) {
 				bg={colorMode === "light" ? bgAdmin : "navy.900"}
 				bgSize="cover"
 				top="0"
-			/>
+			/> */}
 			<Sidebar
-				routes={routes}
+				routes={JSON.parse(localStorage.getItem("uploadedFiles")) || [routes[0]]}
 				logo={
 					<Stack direction="row" spacing="12px" align="center" justify="center">
 						{colorMode === "dark" ? (
