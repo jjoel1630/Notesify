@@ -1,9 +1,11 @@
 import pydetex.pipelines
 import PyPDF2
 import docx
-from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+from transformers import DonutProcessor, VisionEncoderDecoderModel
 from PIL import Image
 import io
+import re
+import torch
 
 def latex_to_txt(latex_bytes):
     # Ensure the input is in bytes
@@ -69,19 +71,41 @@ def jpg_to_txt(jpg_bytes):
 
 
 def written_jpg_to_txt(written_jpg_bytes):
-    # Create a file-like object from the raw bytes
+    # Load Donut Processor and Model
+    processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base-finetuned-cord-v2")
+    model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base-finetuned-cord-v2")
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model.to(device)
+
+    # Load the image using PIL
     with io.BytesIO(written_jpg_bytes) as written_jpg_file:
         # Load the image from the byte stream
         image = Image.open(written_jpg_file).convert("RGB")
 
-    # Initialize the processor and model
-    processor = TrOCRProcessor.from_pretrained('microsoft/trocr-large-handwritten')
-    model = VisionEncoderDecoderModel.from_pretrained('microsoft/trocr-large-handwritten')
+    # Prepare decoder inputs
+    task_prompt = "<s_cord-v2>"
+    decoder_input_ids = processor.tokenizer(task_prompt, add_special_tokens=False, return_tensors="pt").input_ids
 
-    # Process the image and generate text
-    pixel_values = processor(images=image, return_tensors="pt").pixel_values
-    generated_ids = model.generate(pixel_values)
+    # Prepare the image
+    pixel_values = processor(image, return_tensors="pt").pixel_values
 
-    # Decode the generated text
-    generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
-    return generated_text
+    # Generate output from the model
+    outputs = model.generate(
+        pixel_values.to(device),
+        decoder_input_ids=decoder_input_ids.to(device),
+        max_length=model.decoder.config.max_position_embeddings,
+        pad_token_id=processor.tokenizer.pad_token_id,
+        eos_token_id=processor.tokenizer.eos_token_id,
+        use_cache=True,
+        bad_words_ids=[[processor.tokenizer.unk_token_id]],
+        return_dict_in_generate=True,
+    )
+
+    sequence = processor.batch_decode(outputs.sequences)[0]
+    sequence = sequence.replace(processor.tokenizer.eos_token, "").replace(processor.tokenizer.pad_token, "")
+    sequence = re.sub(r"<.*?>", "", sequence, count=1).strip() 
+    sequence = re.sub(r"<s_.*?>", "", sequence).strip() 
+    sequence = re.sub(r"<sep/>", "", sequence).strip() 
+
+    return sequence

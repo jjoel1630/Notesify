@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
-from modules.create_script import condense, convertToScript
+from modules.create_script import condense, convertToScript, normalize_text
 from modules.upload_audio import init_mongodb, upload_audio
 from modules.tts import chunk_text, synthesize_speech, combine_audios
+from modules.cs import normalize_text as norm, condense as cond, convertToScript as cts
 from modules.conversion import *
 from bson import ObjectId, Binary
 from flask_cors import CORS, cross_origin
@@ -79,10 +80,12 @@ def get_audio_id():
             data = pdf_to_txt(file_data)
         elif file_type == "vnd.openxmlformats-officedocument.wordprocessingml.document":
             data = docx_to_txt(file_data)
-        elif file_type == "jpg":
-            data = jpg_to_txt(file_data)
-        elif file_type == "written_jpg":
+        elif file_type == "jpeg":
             data = written_jpg_to_txt(file_data)
+
+        print(data)
+
+        # return "done"
         
         script = create_script(duration, data)
 
@@ -147,9 +150,11 @@ def file_to_text():
 def create_script(maxDuration, text, WPM=160):
     maxWords = maxDuration * WPM
     
-    response = convertToScript(text)
-    if (len(response) > maxWords):
-        response = condense(response, maxWords)
+    response = cts(text)
+    response = norm(response)
+    response = cond(response, maxWords)
+    # if (len(response) > maxWords):
+    #     response = condense(response, maxWords)
     
     return response
 

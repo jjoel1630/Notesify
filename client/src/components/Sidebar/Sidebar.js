@@ -146,7 +146,7 @@ function Sidebar(props) {
 									</Text>
 								</Flex>
 							</Button>
-							<Button
+							{/* <Button
 								boxSize="initial"
 								justifyContent="flex-start"
 								alignItems="center"
@@ -502,7 +502,7 @@ function Sidebar(props) {
 										chem 1212k lab prep
 									</Text>
 								</Flex>
-							</Button>
+							</Button> */}
 						</>
 					) : (
 						<Button
@@ -617,7 +617,7 @@ function Sidebar(props) {
 					</Scrollbars>
 
 					{/* Logo Positioned at the Bottom */}
-					<Box
+					{/* <Box
 						position="absolute"
 						bottom="50px" // Adjust this value to your desired spacing from the bottom
 						left="50%"
@@ -629,8 +629,7 @@ function Sidebar(props) {
 							height="200px" // Set specific height
 							objectFit="contain"
 						/>
-						{/* Adjust size as needed */}
-					</Box>
+					</Box> */}
 				</Box>
 			</Box>
 		</Box>
